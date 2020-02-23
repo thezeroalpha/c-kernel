@@ -42,6 +42,7 @@ header_end:
 
 // Declare initialized constants
 .data
+
 // Global descriptor table with two entries
 .align GDT_TABLE_ALIGNMENT
 gdt_table:
@@ -50,6 +51,7 @@ gdt_table:
 // Skip some space to give the GDT more space
 gdt_table_end:
   .skip (GDT_TABLE_SIZE - (gdt_table_end - gdt_table))
+// The pointer to the GDT table
 gdt_ptr:
   .short GDT_TABLE_SIZE-1
   .long gdt_table // physical address of GDT
