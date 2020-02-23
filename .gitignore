@@ -1,0 +1,7 @@
+boot.o
+kernel.o
+boot.d
+kernel.d
+kernel.iso
+iso/
+kernel
