@@ -14,10 +14,15 @@
 // A GDT entry is 8 bytes
 #define GDT_ENTRY_SIZE 8
 
+#define LIMIT_4GB 0xFFFF
+
 /* flags: [granularity, size, x86-64 code descriptor, 0]
  *  - granularity: 0 (limit is in 1B blocks, byte granularity), 1 (limit is in 4 KiB blocks, page granularity)
  *  - size: 0 (defines 16 bit protected mode), 1 (defines 32 bit protected mode)
  */
+#define GDT_FLAG_4KB_GRANULARITY (1 << 3)
+
+// 64bit flag for code segments, reserved bit for data segments!
 #define GDT_FLAG_64BIT_MODE (1 << 1)
 
 /* access bits: [present, privilege (2), descriptor type, executable bit, direction/conforming bit, readable/writable bit, accessed bit]
@@ -34,8 +39,9 @@
  *  - accessed bit: just set to 0, CPU sets to 1 when it accesses it
  */
 #define GDT_ACCESS_PRESENT (1 << 7)
-#define GDT_ACCESS_PRIVILEGE_RING0 (0x0 << 5)
+#define GDT_ACCESS_PRIVILEGE_RING0 (0 << 5)
 #define GDT_ACCESS_EXECUTABLE (1 << 3)
+#define GDT_ACCESS_RWABLE (1 << 1)
 
 // A macro that makes human-readable code into the terrible layout of GDT
 #define DECLARE_GDT_ENTRY(base, limit, flags, access)                          \
@@ -50,12 +56,21 @@
 
 #define GDT_FIRST_ENTRY 0
 
-#define GDT_KERNEL_ENTRY                                                       \
-  DECLARE_GDT_ENTRY(0, 0,                                                      \
+#define GDT_CODE_ENTRY                                                         \
+  DECLARE_GDT_ENTRY(0, LIMIT_4GB,                                              \
                     GDT_FLAG_64BIT_MODE,                                       \
+                    GDT_FLAG_4KB_GRANULARITY |                                 \
                     GDT_ACCESS_PRESENT |                                       \
                     GDT_ACCESS_PRIVILEGE_RING0 |                               \
+                    GDT_ACCESS_RWABLE |                                        \
                     GDT_ACCESS_EXECUTABLE)                                     \
+
+#define GDT_DATA_ENTRY                                                         \
+  DECLARE_GDT_ENTRY(0, LIMIT_4GB,                                              \
+                    GDT_FLAG_4KB_GRANULARITY,                                  \
+                    GDT_ACCESS_PRESENT |                                       \
+                    GDT_ACCESS_PRIVILEGE_RING0 |                               \
+                    GDT_ACCESS_RWABLE)
 
 #define GDT_TABLE_ALIGNMENT 0x1000
 #define GDT_TABLE_SIZE 0x800

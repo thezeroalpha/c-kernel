@@ -47,7 +47,8 @@ header_end:
 .align GDT_TABLE_ALIGNMENT
 gdt_table:
   .8byte GDT_FIRST_ENTRY
-  .8byte GDT_KERNEL_ENTRY // used in long jump to switch to 64 bit mode
+  .8byte GDT_CODE_ENTRY
+  .8byte GDT_DATA_ENTRY
 // Skip some space to give the GDT more space
 gdt_table_end:
   .skip (GDT_TABLE_SIZE - (gdt_table_end - gdt_table))
@@ -55,7 +56,6 @@ gdt_table_end:
 gdt_ptr:
   .short GDT_TABLE_SIZE-1
   .long gdt_table // physical address of GDT
-
 
 /* Start of boot assembly code */
 .section .text

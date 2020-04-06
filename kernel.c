@@ -38,5 +38,7 @@ void kmain(void) {
   video = print("This kernel prints ", video);
   video = rainbowPrint("rainbow", video);
   video = print(" text!", video);
+  // This should work for interrupts:
+  // asm volatile ("int $0x3");
   while(1);
 }
